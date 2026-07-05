@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Customer Consultation Form</title>
+<style>
+    /* CSS Variables for Colors and Layout */
+    :root {
+        --primary-blue: #005691;
+        --secondary-blue: #cce5f5;
+        --light-grey: #f0f0f0;
+        --text-grey: #555;
+        --border-color: #ddd;
+        --input-focus-border: #80bdff;
+        --calc-btn: #00b050;
+        --pdf-btn: #337ab7;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #fff;
+        color: var(--text-grey);
+    }
+
+    /* Print styling to hide buttons and adjust layout for clean PDF */
+    @media print {
+        body { padding: 0; margin: 1cm; }
+        .buttons-section { display: none !important; }
+        input, textarea { border: none; padding: 0; }
+    }
+
+    /* Layout Container */
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Headers */
+    h1, h2 {
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .company-name {
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--primary-blue);
+        margin-bottom: 5px;
+        text-align: center;
+    }
+
+    .main-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--primary-blue);
+        margin-bottom: 2px;
+        text-align: center;
+    }
+
+    .sub-title {
+        font-size: 14px;
+        color: var(--text-grey);
+        font-weight: normal;
+        border-bottom: 2px solid var(--primary-blue);
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .company-info {
+        background-color: var(--secondary-blue);
+        border-left: 4px solid var(--primary-blue);
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: 3px;
+    }
+
+    .company-info p {
+        margin: 4px 0;
+        font-size: 13px;
+        color: var(--primary-blue);
+        font-weight: 500;
+    }
+
+    .company-info p strong {
+        color: #000;
+    }
+
+    .qr-section {
+        display: none;
+    }
+
+    .qr-card {
+        text-align: center;
+        max-width: 220px;
+    }
+
+    .qr-card .qr-code-wrapper {
+        display: inline-block;
+        transform: scale(0.8);
+        transform-origin: center;
+    }
+
+    .qr-card h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        color: var(--primary-blue);
+    }
+
+    .qr-card p {
+        margin: 8px 0 0;
+        font-size: 12px;
+        color: var(--text-grey);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--primary-blue);
+        border-left: 3px solid var(--primary-blue);
+        padding-left: 10px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+
+    /* Input Styling */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        font-size: 14px;
+    }
+
+    input:focus, textarea:focus {
+        border-color: var(--input-focus-border);
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    textarea {
+        resize: vertical;
+        height: 100px;
+    }
+
+    /* Input placeholders */
+    ::placeholder { color: #bbb; opacity: 1; }
+
+    /* Client Info Grid */
+    .client-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .config-section {
+        margin: 15px 0 20px;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: #fcfdff;
+    }
+
+    .config-note {
+        font-size: 13px;
+        color: var(--text-grey);
+        margin-bottom: 12px;
+    }
+
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .config-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background-color: #fff;
+    }
+
+    .config-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: bold;
+        color: #333;
+        flex: 1;
+    }
+
+    .config-count {
+        width: 70px;
+        min-width: 70px;
+    }
+
+    /* Measurements & Pricing Table */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    th, td {
+        border: 1px solid var(--border-color);
+        text-align: left;
+        padding: 10px;
+        white-space: nowrap;
+    }
+
+    th {
+        background-color: #3e4a5d; /* Dark theme as in image */
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    /* Table Column Widths */
+    th.col-item-desc { width: 30%; }
+    th.col-width { width: 10%; }
+    th.col-height { width: 10%; }
+    th.col-sqft { width: 15%; }
+    th.col-rate { width: 15%; }
+    th.col-total { width: 20%; }
+
+    /* Number input styling for table cells */
+    td input[type="number"] {
+        text-align: right;
+        padding: 8px;
+        margin: 0;
+    }
+
+    /* Calculated (non-editable) cell style */
+    .calc-cell {
+        background-color: var(--light-grey);
+        text-align: right;
+        padding: 8px;
+        font-weight: bold;
+    }
+
+    /* Specific coloring from image */
+    .grand-total-row .calc-cell {
+        background-color: var(--secondary-blue);
+        color: var(--primary-blue);
+    }
+
+    /* Final Breakdown Section */
+    .breakdown-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+
+    .breakdown-table {
+        width: 40%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .print-summary-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 18px;
+        margin-top: 15px;
+        flex-direction: row-reverse;
+    }
+
+    .breakdown-table th, .breakdown-table td {
+        padding: 10px;
+        border: 1px solid var(--border-color);
+    }
+
+    .breakdown-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        text-align: right;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .breakdown-label {
+        background-color: #fff;
+        color: #333;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .grand-total-label {
+        background-color: var(--secondary-blue);
+        color: var(--primary-blue);
+    }
+
+    /* Buttons Section */
+    .buttons-section {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.2s;
+        appearance: none;
+        -webkit-appearance: none; /* For iOS button rendering */
+    }
+
+    .btn-calc {
+        background-color: var(--calc-btn);
+    }
+
+    .btn-calc:hover { background-color: #009945; }
+
+    .btn-pdf {
+        background-color: var(--pdf-btn);
+    }
+
+    .btn-pdf:hover { background-color: #286090; }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 600px) {
+        .client-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .print-summary-row {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .breakdown-container {
+            justify-content: center;
+        }
+
+        .breakdown-table {
+            width: 100%;
+        }
+
+        .buttons-section {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn { width: 100%; max-width: 300px; }
+    }
+
+    /* Print timestamp (hidden on screen, visible in print/PDF) */
+    .print-timestamp { display: none; }
+
+    @media print {
+        .print-timestamp {
+            display: block;
+            position: fixed;
+            top: 0.5cm;
+            left: 0.5cm;
+            font-size: 11px;
+            color: #333;
+            z-index: 9999;
+        }
+
+        .config-section {
+            display: none !important;
+        }
+
+        .item-row.zero-cost-row {
+            display: none !important;
+        }
+
+        .qr-section {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #fafafa;
+            min-width: 180px;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <div id="printTimestamp" class="print-timestamp" aria-hidden="true"></div>
+
+<div class="form-container">
+
+    <div class="company-name">Wonder Woods</div>
+
+    <div class="company-info">
+        <p><strong>Phone:</strong> 9971762461</p>
+        <p><strong>Email:</strong> wonderwoodsinteriors.com</p>
+    </div>
+
+    <h1 class="main-title">CUSTOMER CONSULTATION FORM</h1>
+    <h2 class="sub-title">Measurement Log, Area Calculations, and Quotation Tool</h2>
+
+    <div class="section-title">1. Client Information</div>
+    <div class="client-grid">
+        <div class="input-group">
+            <label for="customerName">Customer Name</label>
+            <input type="text" id="customerName" placeholder="Enter full name">
+        </div>
+        <div class="input-group">
+            <label for="whatsappNumber">Contact/WhatsApp Number</label>
+            <input type="number" id="whatsappNumber" placeholder="e.g., 9878543210">
+        </div>
+        <div class="input-group">
+            <label for="emailId">Email ID</label>
+            <input type="email" id="emailId" placeholder="client@example.com">
+        </div>
+        <div class="input-group">
+            <label for="siteAddress">Site Address</label>
+            <textarea id="siteAddress" placeholder="Full delivery and installation address"></textarea>
+        </div>
+    </div>
+
+    <div class="section-title">2. Measurements & Material Pricing</div>
+    <div class="config-section">
+        <div class="config-note">Select any optional item group and enter how many extra rows you want added. The fixed rows already include Wardrobe 1, Kitchen U1, Kitchen Lower 1, Lights, and Kitchen TANDUM.box.</div>
+        <div class="config-grid">
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="wardrobe"> Wardrobe</label>
+                <input type="number" class="config-count item-count" data-group="wardrobe" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="kitchenUpper"> Kitchen U</label>
+                <input type="number" class="config-count item-count" data-group="kitchenUpper" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="kitchenLower"> Kitchen Lower</label>
+                <input type="number" class="config-count item-count" data-group="kitchenLower" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="rollingShutter"> Rolling shutter</label>
+                <input type="number" class="config-count item-count" data-group="rollingShutter" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="cornerUnit"> Corner unit</label>
+                <input type="number" class="config-count item-count" data-group="cornerUnit" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="pantry"> Pantry</label>
+                <input type="number" class="config-count item-count" data-group="pantry" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="glassDoor"> Glass profile door</label>
+                <input type="number" class="config-count item-count" data-group="glassDoor" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="acrylic"> Acrylic laminates</label>
+                <input type="number" class="config-count item-count" data-group="acrylic" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="shoeCabinet"> Shoe cabinet</label>
+                <input type="number" class="config-count item-count" data-group="shoeCabinet" min="1" value="2" step="1">
+            </div>
+            <div class="config-card">
+                <label class="config-label"><input type="checkbox" class="item-toggle" data-group="tvPanel"> TV panel</label>
+                <input type="number" class="config-count item-count" data-group="tvPanel" min="1" value="2" step="1">
+            </div>
+        </div>
+    </div>
+    <div class="table-container">
+        <table id="measurementsTable">
+            <thead>
+                <tr>
+                    <th class="col-item-desc">Item Description</th>
+                    <th class="col-width">Width (in)</th>
+                    <th class="col-height">Height (in)</th>
+                    <th class="col-sqft">Total Sq. Ft.</th>
+                    <th class="col-rate">Rate / Sq.Ft (₹)</th>
+                    <th class="col-total">Total Cost (₹)</th>
+                </tr>
+            </thead>
+            <tbody id="measurementsBody"></tbody>
+        </table>
+    </div>
+
+    <div class="section-title">3. Final Calculation Breakdowns</div>
+    <div class="print-summary-row">
+        <div class="breakdown-container">
+            <table class="breakdown-table">
+                <tr>
+                    <th class="breakdown-label">Items Subtotal (₹)</th>
+                    <td><div class="calc-cell" id="breakdownSubtotal">0.00</div></td>
+                </tr>
+                <tr>
+                    <th class="breakdown-label">GST (18% ₹)</th>
+                    <td><div class="calc-cell" id="breakdownGst">0.00</div></td>
+                </tr>
+                <tr>
+                    <th class="breakdown-label">Freight (₹)</th>
+                    <td><input type="number" class="breakdown-input" id="breakdownFreight" value="0" step="0.01"></td>
+                </tr>
+                <tr>
+                    <th class="breakdown-label">Round Off (+/-)</th>
+                    <td><input type="number" class="breakdown-input" id="breakdownRoundOff" value="0" step="0.01"></td>
+                </tr>
+                <tr class="grand-total-row">
+                    <th class="breakdown-label grand-total-label">GRAND TOTAL (₹)</th>
+                    <td><div class="calc-cell" id="breakdownGrandTotal">0.00</div></td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <div class="qr-section">
+                <div class="qr-card">
+                    <h3>Bank Details QR</h3>
+                    <div class="qr-code-wrapper">
+                        <div id="bankQrCode"></div>
+                    </div>
+                    <p>Scan to view bank details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons-section">
+        <button class="btn btn-calc" onclick="calculateQuotations()">Calculate</button>
+        <button class="btn btn-pdf" onclick="savePdfToGoogleDrive()">Save to Google Drive</button>
+        <button class="btn btn-pdf" onclick="generateAndOpenPDF('share')">Share PDF to Whatsapp</button>
+        <button class="btn btn-pdf" onclick="generateAndOpenPDF('print')">Generate PDF/Print</button>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+    const bankDetailsText = "Bank Name: ICICI BANK LTD\nAccount Number: 732505500015\nIFSC: ICIC0007325\nBranch: DLF CORPORATE PARK GURGAON\nUPI ID: 9971762461.ibz@icici";
+    const defaultRate = 1350;
+    const fixedItems = [
+        "Wardrobe 1",
+        "Kitchen U1 (Upper)",
+        "Kitchen Lower 1",
+        "Lights",
+        "Kitchen TANDUM.box"
+    ];
+
+    const dynamicItemGroups = [
+        { key: "wardrobe", baseLabel: "Wardrobe" },
+        { key: "kitchenUpper", baseLabel: "Kitchen U" },
+        { key: "kitchenLower", baseLabel: "Kitchen Lower" },
+        { key: "rollingShutter", baseLabel: "Rolling shutter" },
+        { key: "cornerUnit", baseLabel: "Corner unit" },
+        { key: "pantry", baseLabel: "Pantry" },
+        { key: "glassDoor", baseLabel: "Glass profile door" },
+        { key: "acrylic", baseLabel: "Acrylic laminates" },
+        { key: "shoeCabinet", baseLabel: "Shoe cabinet" },
+        { key: "tvPanel", baseLabel: "TV PANEL" }
+    ];
+
+    function renderBankQrCode() {
+        const container = document.getElementById('bankQrCode');
+        if (!container || typeof QRCode === 'undefined') return;
+        container.innerHTML = '';
+        new QRCode(container, {
+            text: bankDetailsText,
+            width: 140,
+            height: 140,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    function buildItemLabel(group, index) {
+        if (group.baseLabel === 'Kitchen U') return `Kitchen U${index}`;
+        if (group.baseLabel === 'TV PANEL') return `TV PANEL ${index}`;
+        return `${group.baseLabel} ${index}`;
+    }
+
+    function getItemsToRender() {
+        const items = [...fixedItems];
+
+        dynamicItemGroups.forEach(group => {
+            const checkbox = document.querySelector(`.item-toggle[data-group="${group.key}"]`);
+            const countInput = document.querySelector(`.item-count[data-group="${group.key}"]`);
+            if (!checkbox || !countInput || !checkbox.checked) return;
+
+            const count = parseInt(countInput.value, 10) || 0;
+            for (let index = 2; index <= count + 1; index += 1) {
+                items.push(buildItemLabel(group, index));
+            }
+        });
+
+        return items;
+    }
+
+    function renderItemRows() {
+        const tbody = document.getElementById('measurementsBody');
+        if (!tbody) return;
+
+        const items = getItemsToRender();
+        tbody.innerHTML = items.map(item => `
+            <tr class="item-row">
+                <td>${item}</td>
+                <td><input type="number" class="input-width" value="0" step="1"></td>
+                <td><input type="number" class="input-height" value="0" step="1"></td>
+                <td><div class="calc-cell output-sqft">0.00</div></td>
+                <td><input type="number" class="input-rate" value="${defaultRate}" step="10"></td>
+                <td><div class="calc-cell output-total">0.00</div></td>
+            </tr>
+        `).join('');
+
+        calculateQuotations();
+    }
+
+    function calculateQuotations() {
+        const rows = document.querySelectorAll('.item-row');
+        let subtotal = 0;
+
+        rows.forEach(row => {
+            const widthInches = parseFloat(row.querySelector('.input-width').value) || 0;
+            const heightInches = parseFloat(row.querySelector('.input-height').value) || 0;
+            const ratePerSqFt = parseFloat(row.querySelector('.input-rate').value) || 0;
+
+            const totalSqIn = widthInches * heightInches;
+            const totalSqFt = totalSqIn / 144;
+            const totalCost = totalSqFt * ratePerSqFt;
+
+            row.querySelector('.output-sqft').textContent = totalSqFt.toFixed(2);
+            row.querySelector('.output-total').textContent = totalCost.toFixed(2);
+
+            if (totalCost === 0) {
+                row.classList.add('zero-cost-row');
+            } else {
+                row.classList.remove('zero-cost-row');
+            }
+
+            if (totalCost !== 0) {
+                subtotal += totalCost;
+            }
+        });
+
+        const gst = subtotal * 0.18;
+        const freight = Math.abs(parseFloat(document.getElementById('breakdownFreight').value) || 0);
+        const roundOff = parseFloat(document.getElementById('breakdownRoundOff').value) || 0;
+        const grandTotal = subtotal + gst + freight + roundOff;
+
+        document.getElementById('breakdownSubtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('breakdownGst').textContent = gst.toFixed(2);
+        document.getElementById('breakdownGrandTotal').textContent = grandTotal.toFixed(2);
+    }
+
+    function bindDynamicItemControls() {
+        document.querySelectorAll('.item-toggle, .item-count').forEach(control => {
+            control.addEventListener('change', renderItemRows);
+            control.addEventListener('input', renderItemRows);
+        });
+    }
+
+    function setPrintTimestamp() {
+        const el = document.getElementById('printTimestamp');
+        if (!el) return;
+        const now = new Date();
+        const pad = (n) => n.toString().padStart(2, '0');
+        const formatted = `${pad(now.getDate())}-${pad(now.getMonth()+1)}-${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        el.textContent = formatted;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setPrintTimestamp();
+        renderBankQrCode();
+        bindDynamicItemControls();
+        renderItemRows();
+    });
+
+    const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
+    const GOOGLE_CLIENT_ID = '799926978174-lqcb8um0o1ecb7mu6audjp70tu9a64bd.apps.googleusercontent.com';
+    const GOOGLE_DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
+    const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+    let googleApiInitialized = false;
+
+    function initGoogleApiClient() {
+        return new Promise((resolve, reject) => {
+            if (googleApiInitialized) {
+                resolve();
+                return;
+            }
+
+            gapi.load('client:auth2', {
+                callback: function() {
+                    gapi.client.init({
+                        apiKey: GOOGLE_API_KEY,
+                        clientId: GOOGLE_CLIENT_ID,
+                        discoveryDocs: GOOGLE_DISCOVERY_DOCS,
+                        scope: GOOGLE_SCOPES
+                    }).then(() => {
+                        googleApiInitialized = true;
+                        resolve();
+                    }).catch(reject);
+                },
+                onerror: reject,
+                timeout: 5000,
+                ontimeout: reject
+            });
+        });
+    }
+
+    function signInToGoogleDrive() {
+        return initGoogleApiClient().then(() => {
+            const authInstance = gapi.auth2.getAuthInstance();
+            if (!authInstance.isSignedIn.get()) {
+                return authInstance.signIn();
+            }
+            return authInstance.currentUser.get();
+        });
+    }
+
+    function createPdfBlob() {
+        const formContainer = document.querySelector('.form-container');
+        const clone = formContainer.cloneNode(true);
+        clone.querySelector('.config-section')?.remove();
+        clone.querySelector('.buttons-section')?.remove();
+
+        const opt = {
+            margin: 0.2,
+            filename: 'Quotation.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, logging: false, useCORS: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        return html2pdf().from(clone).set(opt).outputPdf('blob');
+    }
+
+    function savePdfToGoogleDrive() {
+        setPrintTimestamp();
+        calculateQuotations();
+
+        if (typeof gapi === 'undefined') {
+            alert('Google API failed to load. Refresh the page and try again.');
+            return;
+        }
+
+        signInToGoogleDrive().then(() => createPdfBlob()).then(blob => {
+            const metadata = {
+                name: `Quotation-${new Date().toISOString().slice(0, 10)}.pdf`,
+                mimeType: 'application/pdf'
+            };
+
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', blob);
+
+            return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+                method: 'POST',
+                headers: new Headers({ 'Authorization': 'Bearer ' + gapi.auth.getToken().access_token }),
+                body: form
+            });
+        }).then(response => response.json()).then(result => {
+            if (result && result.id) {
+                alert(`Saved to Google Drive: ${result.name}`);
+            } else {
+                throw new Error('Google Drive upload did not return a file ID.');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('Unable to save PDF to Google Drive. Check console for details.');
+        });
+    }
+
+    function generateAndOpenPDF(action) {
+        setPrintTimestamp();
+        calculateQuotations();
+
+        if (action === 'share') {
+            const printWindow = window.open('', '_blank', 'width=900,height=1200');
+            if (printWindow) {
+                const styles = Array.from(document.querySelectorAll('style')).map(style => style.outerHTML).join('');
+                const formContainer = document.querySelector('.form-container');
+                const printableContent = formContainer.cloneNode(true);
+                printableContent.querySelector('.config-section')?.remove();
+                printableContent.querySelector('.buttons-section')?.remove();
+                printWindow.document.write(`<!DOCTYPE html><html><head><title>Quotation</title>${styles}</head><body>${printableContent.outerHTML}</body></html>`);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => printWindow.print(), 250);
+                return;
+            }
+        }
+
+        window.print();
+    }
+</script>
+
+</body>
+</html>
